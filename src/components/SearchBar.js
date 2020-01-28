@@ -2,77 +2,18 @@ import React, { Component } from 'react';
 import MovieList from './MovieList';
 
 class SearchBar extends Component {
-  state = {
-    activeSuggestion: 0,
-    filteredSuggestions: [],
-    showSuggestions: false,
-    userInput: ''
-  };
-
-  onChange = e => {
-    const userInput = e.currentTarget.value;
-    const filteredSuggestions = this.props.suggestions.filter(suggestion => {
-      return suggestion.toLowerCase().includes(userInput.toLowerCase());
-    });
-    this.setState({
-      activeSuggestion: 0,
-      filteredSuggestions,
-      showSuggestions: true,
-      userInput
-    });
-  };
-
-  onKeyDown = e => {
-    const { activeSuggestion, filteredSuggestions } = this.state;
-    // User presses enter
-    if (e.keyCode === 13) {
-      this.setState({
-        activeSuggestion: 0,
-        showSuggestions: false,
-        userInput: filteredSuggestions[activeSuggestion]
-      });
-    }
-    // User presses up arrow
-    else if (e.keyCode === 38) {
-      if (activeSuggestion === 0) {
-        return;
-      }
-      this.setState({
-        activeSuggestion: activeSuggestion - 1
-      });
-    }
-    // User presses down
-    else if (e.keyCode === 40) {
-      if (activeSuggestion - 1 === filteredSuggestions.length) {
-        return;
-      }
-      this.setState({
-        activeSuggestion: activeSuggestion + 1
-      });
-    }
-  };
-
-  onClick = e => {
-    this.setState({
-      activeSuggestion: 0,
-      filteredSuggestions: [],
-      showSuggestions: false,
-      userInput: e.currentTarget.innerText
-    });
-  };
-
   render() {
     const {
       onChange,
       onClick,
       onKeyDown,
-      state: {
-        activeSuggestion,
-        filteredSuggestions,
-        showSuggestions,
-        userInput
-      }
-    } = this;
+      activeSuggestion,
+      filteredSuggestions,
+      showSuggestions,
+      userInput,
+      movieList,
+      initialList
+    } = this.props;
 
     let suggestionsListComponent;
 
@@ -86,7 +27,7 @@ class SearchBar extends Component {
                 className = 'suggestion-active';
               }
               return (
-                <li className={className} key={suggestion} onClick={onClick}>
+                <li className={className} key={suggestion} onClick={e=>onClick(e)}>
                   {suggestion}
                 </li>
               );
@@ -102,20 +43,42 @@ class SearchBar extends Component {
       }
     }
 
+    let selectedMovies = movieList.filter(data => {
+        return data.original_title
+          .toLowerCase()
+          .includes(userInput.toLowerCase());
+      });
+    
+      let finalMovie = movieList.filter(data => {
+        return data.original_title
+          .toLowerCase()
+          ===(userInput.toLowerCase());
+      });
+
     return (
       <div>
+      {console.log('final movie', finalMovie)}
+      {console.log('selected movie', selectedMovies)}
         <h3 className='search-title'>Search for your favorite movies</h3>
         <input
           className='input-item'
           type='text'
-          onChange={onChange}
-          onKeyDown={onKeyDown}
+          onChange={e=>onChange(e)}
+          onKeyDown={e=>onKeyDown(e)}
           value={userInput}
           placeholder='Type movie names here'
         />
         {suggestionsListComponent}
         <div className='suggestion-container'>
-          <MovieList userInput={userInput} movieList={this.props.movieList} />
+        {movieList.length===0 ? 
+          <MovieList
+            selectedMovie={initialList}
+          />
+          
+          :<MovieList
+            selectedMovie={selectedMovies}
+          />
+        }
         </div>
       </div>
     );

@@ -2,16 +2,10 @@ import React, { Component } from 'react';
 
 export default class MovieList extends Component {
   render() {
-    let selectedMovie;
-      selectedMovie = this.props.movieList.filter(data => {
-        return data.original_title
-          .toLowerCase()
-          .includes(this.props.userInput.toLowerCase());
-      });
 
     return (
       <>
-        {selectedMovie.map(movie => {
+        {this.props.selectedMovie.map(movie => {
           return (
             <div key={movie.id} className='movie-item'>
               <img
